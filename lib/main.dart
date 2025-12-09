@@ -1,13 +1,50 @@
 import 'package:flutter/material.dart';
-import 'package:questoes/botoes.dart';
+import './dados.dart';
+import './lista_perguntas.dart';
+//import './resultado.dart';
 
 void main() {
-  runApp(const MainApp());
+  runApp(MainApp());
 }
 
 class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+  @override
+  Widget build(BuildContext context){
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Home(),
+    );
+  }
+}
 
+class Home extends StatefulWidget{
+  @override
+  HomeState createState() => HomeState();
+}
+
+class HomeState extends State<Home>{
+  final dados = perguntasRespostas;
+  List respostas = [];
+  var indicePergunta = 0;
+
+  void responder(String r){
+    String p = dados[indicePergunta].pergunta;
+    respostas.add({'pergunta': p, 'resposta': r});
+    indicePergunta++;
+    setState(() {});
+  }
+
+  void reiniciar(){
+    setState(() {
+      indicePergunta = 0;
+      respostas = [];
+    });
+  }
+
+  bool get temPergunta {
+    return indicePergunta < dados.length;
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,49 +56,13 @@ class MainApp extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.all(15),
-        child: Column(
-          children: [
-            Text(
-              perguntas[indicePergunta],
-              style: TextStyle(fontSize: 30)
-            ),
-            Botoes(resp: responder),
-            Botoes(resp: responder),
-            Botoes(resp: responder),
-          ],
-        ),
+        child: temPergunta ? ListaPerguntas(
+            indicePergunta: indicePergunta,
+            perguntas: dados,
+            responder: responder,
+        )
+        : null //Resultado(respostas, reiniciar),
       ),
     );
-  }
-}
-
-class Home extends StatefulWidget{
-  const Home({super.key});
-
-  @override
-  HomeState createState() => HomeState();
-}
-
-class HomeState extends State<Home>{
-  final perguntas = [
-    'Qual a sua cor favorita?',
-    'Qual o seu animal favorito?',
-    'Qual o seu time favorito?',
-  ];
-
-  var indicePergunta = 0;
-
-  void responder(){
-    if (indicePergunta < perguntas.length - 1){
-      indicePergunta++;
-    } else {
-      indicePergunta = 0;
-    }
-    setState(() {});
-  }
-  
-  @override
-  Widget build(BuildContext context) {
-    throw UnimplementedError();
   }
 }
