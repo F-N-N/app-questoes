@@ -3,6 +3,8 @@ import './dados.dart';
 import './lista_perguntas.dart';
 import './resultado.dart';
 
+import 'package:google_fonts/google_fonts.dart';
+
 void main() {
   runApp(MainApp());
 }
@@ -12,6 +14,7 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context){
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(fontFamily: GoogleFonts.merriweatherSans().fontFamily),
       home: Home(),
     );
   }
@@ -26,10 +29,18 @@ class HomeState extends State<Home>{
   final dados = perguntasRespostas;
   List respostas = [];
   var indicePergunta = 0;
+  var totalPontos = 0;
 
-  void responder(String r){
+  @override
+  void initState(){
+    super.initState();
+    perguntasRespostas.shuffle();
+  }
+
+  void responder(String r, int ponto){
     String p = dados[indicePergunta].pergunta;
-    respostas.add({'pergunta': p, 'resposta': r});
+    respostas.add({'pergunta': p, 'resposta': r, 'ponto': ponto});
+    totalPontos += ponto;
     indicePergunta++;
     setState(() {});
   }
@@ -37,7 +48,9 @@ class HomeState extends State<Home>{
   void reiniciar(){
     setState(() {
       indicePergunta = 0;
+      totalPontos = 0;
       respostas = [];
+      perguntasRespostas.shuffle();
     });
   }
 
@@ -54,14 +67,16 @@ class HomeState extends State<Home>{
         backgroundColor: Colors.amber,
         toolbarHeight: 80,
       ),
-      body: Padding(
+      backgroundColor: Color.fromRGBO(250, 230, 200, 1),
+      body: ListView(
         padding: const EdgeInsets.all(15),
-        child: temPergunta ? ListaPerguntas(
+        children: [temPergunta ? ListaPerguntas(
             indicePergunta: indicePergunta,
             perguntas: dados,
             responder: responder,
-        )
-        : Resultado(respostas, reiniciar),
+          )
+          : Resultado(respostas, reiniciar, totalPontos),
+        ]
       ),
     );
   }
